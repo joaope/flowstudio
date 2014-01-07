@@ -46,7 +46,6 @@
     <Compile Include="Configuration\ToolConfigurationElement.cs" />
     <Compile Include="Configuration\ToolConfigurationElementCollection.cs" />
     <Compile Include="Services\DispatcherService.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="ToolCategoryType.cs" />
     <Compile Include="TypeLocator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
