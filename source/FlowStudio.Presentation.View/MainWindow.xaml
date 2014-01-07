@@ -1,0 +1,443 @@
+﻿<ribbon:RibbonWindow x:Class="FlowStudio.Presentation.View.MainWindow"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:ribbon="clr-namespace:Microsoft.Windows.Controls.Ribbon;assembly=RibbonControlsLibrary"
+                     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+                     xmlns:converters="clr-namespace:FlowStudio.Presentation.View.Converters"
+                     xmlns:view1="clr-namespace:FlowStudio.Presentation.View"
+                     xmlns:data1="clr-namespace:FlowStudio.Presentation.ViewModel.Data;assembly=FlowStudio.Presentation.ViewModel"
+                     Title="{Binding WindowTitle}"
+                     Icon="Images\window.ico"
+		             MinWidth="640" 
+                     MinHeight="480" 
+                     WindowState="Maximized"
+                     Closing="MainWindow_OnClosing"
+                     DataContext="{Binding MainWindowViewModel, Source={StaticResource ModelLocator}}">
+
+    <ribbon:RibbonWindow.Resources>
+        <converters:IsWarningToImageSourceConverter x:Key="IsWarningConverter" />
+        <converters:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+        <converters:NegateBooleanConverter x:Key="NegateBooleanConverter" />
+        <converters:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
+        <converters:ErrorsCountToImageSourceConverter x:Key="ErrorsCountToImageSource" />
+        <converters:ErrorsCountToStatusTextConverter x:Key="ErrorsCountToStatusText" />
+        <xcad:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </ribbon:RibbonWindow.Resources>
+
+    <ribbon:RibbonWindow.InputBindings>
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"/>
+        <KeyBinding Command="{Binding SaveAsCommand}" Modifiers="Control+Alt" Key="S"/>
+
+        <KeyBinding Command="{Binding CutCommand}" Modifiers="Control" Key="X" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" />
+        <KeyBinding Command="{Binding CopyCommand}" Modifiers="Control" Key="C" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" />
+        <KeyBinding Command="{Binding PasteCommand}" Modifiers="Control" Key="V" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" />
+
+        <KeyBinding Command="{Binding RunWithoutDebuggingCommand}" Modifiers="Control" Key="F5" />
+        <KeyBinding Command="{Binding RunWithDebuggingCommand}" Key="F5" />
+        <KeyBinding Command="{Binding AbortExecutionCommand}" Modifiers="Shift" Key="F5" />
+
+        <KeyBinding Command="{Binding UndoCommand}" Modifiers="Control" Key="Z" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" />
+        <KeyBinding Command="{Binding PasteCommand}" Modifiers="Control" Key="Y" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" />
+
+        <KeyBinding Command="{Binding OpenOptionsCommand}" Modifiers="Control" Key="O" />
+        <KeyBinding Command="{Binding AddReferenceCommand}" Modifiers="Control" Key="R" />
+    </ribbon:RibbonWindow.InputBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ribbon:Ribbon Grid.Row="0">
+
+            <ribbon:Ribbon.ApplicationMenu>
+                <ribbon:RibbonApplicationMenu SmallImageSource="Images\RibbonMenu_Small.png">
+
+                    <ribbon:RibbonApplicationMenu.FooterPaneContent>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ribbon:RibbonButton Grid.Column="1" Label="About" Command="{Binding OpenAboutCommand}"
+                                                 SmallImageSource="images\info_small.png" Margin="0,0,8,0" />
+                            <ribbon:RibbonButton Grid.Column="2" SmallImageSource="Images\RibbonMenu_Exit.png" Label="Exit FlowStudio"
+                                                 Click="CloseButton_OnClick"/>
+                        </Grid>
+                    </ribbon:RibbonApplicationMenu.FooterPaneContent>
+
+                    <ribbon:RibbonApplicationSplitMenuItem Command="{Binding NewCommand}" Header="New" ImageSource="Images\new.png"
+                                                           CanAddToQuickAccessToolBarDirectly="True" QuickAccessToolBarImageSource="Images\new_small.png">
+                        <ribbon:RibbonApplicationMenuItem Command="{Binding NewActivityCommand}" Header="Simple Activity (.xaml)" 
+                                                          ImageSource="Images\RibbonMenuItem_Activity.png" CanAddToQuickAccessToolBarDirectly="False" />
+                        <ribbon:RibbonApplicationMenuItem Command="{Binding NewWorkflowServiceCommand}" Header="Workflow Service (.xamlx)" 
+                                                          ImageSource="Images\RibbonMenuItem_WorkflowService.png" />
+                    </ribbon:RibbonApplicationSplitMenuItem>
+                    <ribbon:RibbonApplicationMenuItem Command="{Binding OpenCommand}" Header="Open" ImageSource="Images\RibbonMenuItem_Open.png" />
+                    <ribbon:RibbonSeparator />
+                    <ribbon:RibbonApplicationMenuItem Command="{Binding SaveCommand}" CommandParameter="1" KeyTip="S" Header="Save" ImageSource="Images\RibbonMenuItem_Save.png" />
+                    <ribbon:RibbonApplicationMenuItem Header="Save As..." KeyTip="A" ImageSource="Images\RibbonMenuItem_SaveAs.png" Command="{Binding SaveAsCommand}"/>
+                    <ribbon:RibbonSeparator />
+                    <ribbon:RibbonApplicationMenuItem Command="{Binding OpenOptionsCommand}" ImageSource="images\options.png" Header="Options" />
+                </ribbon:RibbonApplicationMenu>
+            </ribbon:Ribbon.ApplicationMenu>
+
+            <ribbon:RibbonTab Header="Home" KeyTip="T">
+                <ribbon:RibbonGroup Header="Elements">
+                    <ribbon:RibbonMenuButton Label="Add" SmallImageSource="Images\add_small.png" LargeImageSource="Images\add.png"
+                                             IsEnabled="{Binding HasActiveWorkflowFile}">
+                        <ribbon:RibbonMenuItem Header="Argument" Command="{Binding CreateArgumentCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}"/>
+                        <ribbon:RibbonMenuItem Header="Variable" Command="{Binding CreateVariableCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}"/>
+                    </ribbon:RibbonMenuButton>
+                </ribbon:RibbonGroup>
+
+                <ribbon:RibbonGroup Header="Actions" LargeImageSource="Images\undo.png" SmallImageSource="Images\undo_small.png">
+                    <ribbon:RibbonButton Command="{Binding UndoCommand}" 
+                                         Label="Undo" LargeImageSource="Images\undo.png" SmallImageSource="Images\undo_small.png"/>
+                    <ribbon:RibbonButton Command="{Binding RedoCommand}" 
+                                         Label="Redo" LargeImageSource="Images\redo.png" SmallImageSource="Images\redo_small.png"/>
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup Header="Clipboard" LargeImageSource="Images\clipboard.png" SmallImageSource="Images\clipboard_small.png">
+                    <ribbon:RibbonButton Command="{Binding PasteCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}"
+                                         Label="Paste" LargeImageSource="Images\paste.png" SmallImageSource="Images\paste_small.png"/>
+                    <ribbon:RibbonButton Command="{Binding CutCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Cut" SmallImageSource="Images\cut_small.png" LargeImageSource="Images\cut.png"/>
+                    <ribbon:RibbonButton Command="{Binding CopyCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Copy" SmallImageSource="Images\copy_small.png" LargeImageSource="Images\copy.png"/>
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup Header="Image" SmallImageSource="Images\picture_small.png" LargeImageSource="Images\picture.png">
+                    <ribbon:RibbonButton Command="{Binding CopyAsImageCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}"
+                                         Label="Copy" SmallImageSource="Images\copyasimage_small.png" LargeImageSource="Images\copyasimage.png" />
+                    <ribbon:RibbonButton Command="{Binding SaveAsImageCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}"
+                                         Label="Save" SmallImageSource="Images\saveasimage_small.png" LargeImageSource="Images\saveasimage.png" />
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup Header="Toolbox" LargeImageSource="Images\addreference.png" SmallImageSource="Images\addreference_small.png">
+                    <ribbon:RibbonButton Label="Add activity" LargeImageSource="Images\addreference.png" KeyTip="R" SmallImageSource="Images\addreference_small.png"
+                                         Command="{Binding AddReferenceCommand}"
+                                         ToolTipDescription="Load new activity from the available DLLs on references directories. Use this option to add your custom activities to toolbox." 
+                                         ToolTipTitle="Add References (Ctrl+R)" />
+                </ribbon:RibbonGroup>
+            </ribbon:RibbonTab>
+            <ribbon:RibbonTab Header="View">
+                <ribbon:RibbonGroup LargeImageSource="Images\gotoparent.png" SmallImageSource="Images\gotoparent_small.png">
+                    <ribbon:RibbonButton Command="{Binding GoToParentCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Go to parent" LargeImageSource="Images\gotoparent.png" SmallImageSource="Images\gotoparent_small.png" />
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup Header="Zoom">
+                    <ribbon:RibbonButton Command="{Binding ZoomInCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Zoom in" LargeImageSource="Images\zoomin.png" SmallImageSource="Images\zoomin_small.png" />
+                    <ribbon:RibbonButton Command="{Binding ZoomOutCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Zoom out" LargeImageSource="Images\zoomout.png" SmallImageSource="Images\zoomout_small.png" />
+                    <ribbon:RibbonButton Command="{Binding ResetZoomCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="100 %" LargeImageSource="Images\zoomreset.png" SmallImageSource="Images\zoomreset_small.png" />
+                    <ribbon:RibbonButton Command="{Binding FitToScreenCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Fit to screen" LargeImageSource="Images\zoomfittoscreen.png" SmallImageSource="Images\zoomfittoscreen_small.png"/>
+                    <ribbon:RibbonButton Command="{Binding MoveFocusCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Move focus" SmallImageSource="Images\zoommovefocus_small.png" LargeImageSource="Images\zoommovefocus.png"/>
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup Header="Resize" LargeImageSource="Images\resize.png" SmallImageSource="Images\resize_small.png">
+                    <ribbon:RibbonButton Command="{Binding CollapseCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Collapse" LargeImageSource="Images\collapse.png" SmallImageSource="Images\collapse_small.png" />
+                    <ribbon:RibbonButton Command="{Binding ExpandCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Expand" LargeImageSource="Images\expand.png" SmallImageSource="Images\expand_small.png" />
+                    <ribbon:RibbonButton Command="{Binding ExpandAllCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}"
+                                         Label="Expand all" LargeImageSource="Images\expandall.png" SmallImageSource="Images\expandall_small.png" />
+                    <ribbon:RibbonButton Command="{Binding ExpandInPlaceCommand}" CommandTarget="{Binding ActiveWorkflowFile.DesignerView}" 
+                                         Label="Expand in-place" LargeImageSource="Images\expandinplace.png" SmallImageSource="Images\expandinplace_small.png" />
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup Header="Show or hide tools" LargeImageSource="Images\showhidetools.png" SmallImageSource="Images\showhidetools_small.png">
+                    <ribbon:RibbonCheckBox IsChecked="{Binding ToolboxViewModel.IsVisible, Mode=TwoWay}" Label="Toolbox" />
+                    <ribbon:RibbonCheckBox IsChecked="{Binding PropertyInspectorViewModel.IsVisible, Mode=TwoWay}" Label="Properties Editor" />
+                    <ribbon:RibbonCheckBox IsChecked="{Binding ErrorsListViewModel.IsVisible, Mode=TwoWay}" Label="Errors List" />
+                    <ribbon:RibbonCheckBox IsChecked="{Binding OutputViewModel.IsVisible, Mode=TwoWay}" Label="Output" />
+                    <ribbon:RibbonCheckBox IsChecked="{Binding DebugViewModel.IsVisible, Mode=TwoWay}" Label="Debug" />
+                </ribbon:RibbonGroup>
+            </ribbon:RibbonTab>
+            <ribbon:RibbonTab Header="Run">
+                <ribbon:RibbonGroup Header="Execution">
+                    <ribbon:RibbonButton Command="{Binding RunWithoutDebuggingCommand}" 
+                                         IsEnabled="{Binding ActiveWorkflowFile.IsExecuting, Converter={StaticResource NegateBooleanConverter}}"
+                                         Label="Start" LargeImageSource="images\start.png" SmallImageSource="images\start_small.png" />
+                    <ribbon:RibbonButton Command="{Binding RunWithDebuggingCommand}" 
+                                         IsEnabled="{Binding ActiveWorkflowFile.IsExecuting, Converter={StaticResource NegateBooleanConverter}}" 
+                                         Label="Debug" LargeImageSource="images\startdebug.png" SmallImageSource="images\startdebug_small.png" />
+                </ribbon:RibbonGroup>
+                <ribbon:RibbonGroup>
+                    <ribbon:RibbonButton Command="{Binding AbortExecutionCommand}" IsEnabled="{Binding ActiveWorkflowFile.IsExecuting}"
+                                        Label="Stop" LargeImageSource="images\stop.png" SmallImageSource="images\stop_small.png" />
+                </ribbon:RibbonGroup>
+            </ribbon:RibbonTab>
+        </ribbon:Ribbon>
+
+        <xcad:DockingManager Grid.Row="1"
+                                   ActiveContent="{Binding ActiveWorkflowFile, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+                                   DocumentsSource="{Binding Files}" 
+                                   AnchorablesSource="{Binding Tools}">
+
+            <xcad:DockingManager.Theme>
+                <xcad:AeroTheme />
+            </xcad:DockingManager.Theme>
+
+            <xcad:DockingManager.Resources>
+                <view1:DataContextSpy x:Key="DataContextSpy"/>
+            </xcad:DockingManager.Resources>
+
+            <xcad:DockingManager.LayoutItemTemplateSelector>
+                <view1:PanesTemplateSelector>
+                    <view1:PanesTemplateSelector.WorkflowFileTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding WorkflowDesignerView}" />
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.WorkflowFileTemplate>
+                    <view1:PanesTemplateSelector.ToolboxTemplate>
+                        <DataTemplate>
+                            <view1:Toolbox Categories="{Binding Categories}"/>
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.ToolboxTemplate>
+                    <view1:PanesTemplateSelector.PropertyInspectorTemplate>
+                        <DataTemplate>
+                            <ContentControl 
+                                Content="{Binding Source={StaticResource DataContextSpy}, Path=DataContext.ActiveWorkflowFile.PropertyInspectorView}" />
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.PropertyInspectorTemplate>
+                    <view1:PanesTemplateSelector.ErrorsListTemplate>
+                        <DataTemplate>
+                            <DataGrid AutoGenerateColumns="False" IsReadOnly="True"
+                                      ItemsSource="{Binding Source={StaticResource DataContextSpy}, Path=DataContext.ActiveWorkflowFile.ValidationErrorInfos}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Width="SizeToCells" CanUserResize="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Image Source="{Binding IsWarning, Converter={StaticResource IsWarningConverter}}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
+                                    <DataGridTextColumn Header="Property" Binding="{Binding PropertyName}" />
+                                    <DataGridTextColumn Header="Error Message" Binding="{Binding Message}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.ErrorsListTemplate>
+                    <view1:PanesTemplateSelector.OutputTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBox Text="{Binding Source={StaticResource DataContextSpy}, Path=DataContext.ActiveWorkflowFile.OutputText, Mode=OneWay}" 
+                                         IsReadOnly="True" FontFamily="Consolas" FontSize="12px" Grid.Row="0"
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                                         TextChanged="TextBoxBase_OnTextChanged"/>
+                            </Grid>
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.OutputTemplate>
+                    <view1:PanesTemplateSelector.DebugTemplate>
+                        <DataTemplate>
+                            <DataGrid ItemsSource="{Binding Source={StaticResource DataContextSpy}, Path=DataContext.ActiveWorkflowFile.DebugSteps}"
+                                      AutoGenerateColumns="False" IsReadOnly="True"
+                                      Name="DebugDataGrid" SelectionMode="Single" GridLinesVisibility="None">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Step" Binding="{Binding StepCount}" />
+                                    <DataGridTextColumn Header="Event Time" Binding="{Binding EventTime}" />
+                                    <DataGridTextColumn Header="Activity Id" Binding="{Binding ActivityId}" />
+                                    <DataGridTextColumn Header="Activity Name" Binding="{Binding ActivityName}" />
+                                    <DataGridTextColumn Header="State" Binding="{Binding State}" />
+                                    <DataGridTextColumn Header="Instance Id" Binding="{Binding InstanceId}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.DebugTemplate>
+                    <view1:PanesTemplateSelector.WorkflowOutlineTemplate>
+                        <DataTemplate>
+                            <TreeView ItemsSource="{Binding Source={StaticResource DataContextSpy}, Path=DataContext.ActiveWorkflowFile.Outline}">
+                                <TreeView.Resources>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type data1:OutlineActivityBuilderItem}" ItemsSource="{Binding InnerItems}">
+                                        <Border Margin="5,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}" Margin="0,0,10,0" FontWeight="Bold"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text="(ActivityBuilder)"
+                                                           FontStyle="Italic" FontSize="10" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <HierarchicalDataTemplate.ItemContainerStyle>
+                                            <Style TargetType="{x:Type TreeViewItem}">
+                                                <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                                            </Style>
+                                        </HierarchicalDataTemplate.ItemContainerStyle>
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type data1:OutlineActivityItem}" ItemsSource="{Binding InnerItems}">
+                                        <Border Margin="5,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding DisplayName}" Margin="0,0,10,0"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding ActivityType.Name, StringFormat=({0})}"
+                                                           FontStyle="Italic" FontSize="10" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <Border.ToolTip>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Label Content="Name:" FontWeight="Bold" Grid.Column="0" Grid.Row="0"/>
+                                                    <Label Content="{Binding ActivityType.Name}" Grid.Column="1" Grid.Row="0"/>
+                                                    <Label Content="Namespace:" FontWeight="Bold" Grid.Column="0" Grid.Row="1"/>
+                                                    <Label Content="{Binding ActivityType.Namespace}" Grid.Column="1" Grid.Row="1"/>
+                                                    <Label Content="Assembly:" FontWeight="Bold" Grid.Column="0" Grid.Row="2"/>
+                                                    <Label Content="{Binding ActivityType.Assembly.FullName}" Grid.Column="1" Grid.Row="2"/>
+                                                </Grid>
+                                            </Border.ToolTip>
+                                        </Border>
+                                        <HierarchicalDataTemplate.ItemContainerStyle>
+                                            <Style TargetType="{x:Type TreeViewItem}">
+                                                <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                                            </Style>
+                                        </HierarchicalDataTemplate.ItemContainerStyle>
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type data1:OutlinePropertyHolderItem}" ItemsSource="{Binding InnerItems}">
+                                        <Border Margin="5,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding PropertyName}" Margin="0,0,10,0"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <HierarchicalDataTemplate.ItemContainerStyle>
+                                            <Style TargetType="{x:Type TreeViewItem}">
+                                                <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                                            </Style>
+                                        </HierarchicalDataTemplate.ItemContainerStyle>
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type data1:OutlineVariableItem}" ItemsSource="{Binding InnerItems}">
+                                        <Border Margin="5,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}" Margin="0,0,10,0"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Type.Name, StringFormat=({0})}"
+                                                           FontStyle="Italic" FontSize="10" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                        <HierarchicalDataTemplate.ItemContainerStyle>
+                                            <Style TargetType="{x:Type TreeViewItem}">
+                                                <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                                            </Style>
+                                        </HierarchicalDataTemplate.ItemContainerStyle>
+                                    </HierarchicalDataTemplate>
+
+                                    <HierarchicalDataTemplate DataType="{x:Type data1:OutlineFlowNodeItem}" ItemsSource="{Binding InnerItems}">
+                                        <Border Margin="5,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding FlowNodeType.Name}" Margin="0,0,10,0"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <HierarchicalDataTemplate.ItemContainerStyle>
+                                            <Style TargetType="{x:Type TreeViewItem}">
+                                                <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                                            </Style>
+                                        </HierarchicalDataTemplate.ItemContainerStyle>
+                                    </HierarchicalDataTemplate>
+
+                                </TreeView.Resources>
+                            </TreeView>
+                        </DataTemplate>
+                    </view1:PanesTemplateSelector.WorkflowOutlineTemplate>
+                </view1:PanesTemplateSelector>
+            </xcad:DockingManager.LayoutItemTemplateSelector>
+
+            <xcad:DockingManager.LayoutItemContainerStyleSelector>
+                <view1:PanesStyleSelector>
+                    <view1:PanesStyleSelector.FileStyle>
+                        <Style TargetType="{x:Type xcad:LayoutDocumentItem}">
+                            <Setter Property="Title" Value="{Binding Model.Title}" />
+                            <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+                            <Setter Property="ToolTip" Value="{Binding Model.FilePath}" />
+                            <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                            <Setter Property="CloseAllButThisCommand" Value="{Binding Model.CloseAllButThisCommand}" />
+                            <Setter Property="CanClose" Value="{Binding Model.IsExecuting, Converter={StaticResource NegateBooleanConverter}}"/>
+                        </Style>
+                    </view1:PanesStyleSelector.FileStyle>
+                    <view1:PanesStyleSelector.ToolStyle>
+                        <Style TargetType="{x:Type xcad:LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{Binding Model.Title}" />
+                            <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+                            <Setter Property="Visibility" 
+                                    Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
+                        </Style>
+                    </view1:PanesStyleSelector.ToolStyle>
+                </view1:PanesStyleSelector>
+            </xcad:DockingManager.LayoutItemContainerStyleSelector>
+
+            <xcad:DockingManager.LayoutUpdateStrategy>
+                <view1:LayoutUpdateStategy />
+            </xcad:DockingManager.LayoutUpdateStrategy>
+
+            <xcad:LayoutRoot>
+                <xcad:LayoutPanel Orientation="Vertical">
+                    <xcad:LayoutPanel Orientation="Horizontal">
+                        <xcad:LayoutAnchorablePane Name="LeftToolsPane" DockWidth="270"/>
+                        <xcad:LayoutDocumentPane/>
+                        <xcad:LayoutAnchorablePane Name="RightToolsPane" DockWidth="270"/>
+                    </xcad:LayoutPanel>
+                    <xcad:LayoutAnchorablePane Name="BottomToolsPane" DockHeight="150" />
+                </xcad:LayoutPanel>
+            </xcad:LayoutRoot>
+
+        </xcad:DockingManager>
+
+        <StatusBar Grid.Row="2">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+
+            <StatusBarItem Grid.Column="0">
+                <TextBlock Text="{Binding StatusViewModel.Text}"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding StatusViewModel.ProgressText}" Grid.Column="0" Margin="0,0,8,0" />
+                    <ProgressBar Value="{Binding StatusViewModel.ProgressValue}" Minimum="0" Maximum="100" Grid.Column="1" Width="100"
+                                 Visibility="{Binding StatusViewModel.ProgressValue, Converter={StaticResource NullableToVisibilityConverter}}"/>
+                </Grid>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right" HorizontalContentAlignment="Center" Grid.Column="2" 
+                           Visibility="{Binding ActiveWorkflowFile, Converter={StaticResource NullableToVisibilityConverter}}">
+                <Image Source="{Binding ActiveWorkflowFile.ValidationErrorInfos.Count, Converter={StaticResource ErrorsCountToImageSource}}" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalContentAlignment="Right" HorizontalAlignment="Right" Grid.Column="3" 
+                           Visibility="{Binding ActiveWorkflowFile, Converter={StaticResource NullableToVisibilityConverter}}">
+                <TextBlock Text="{Binding ActiveWorkflowFile.ValidationErrorInfos.Count, Converter={StaticResource ErrorsCountToStatusText}}"/>
+            </StatusBarItem>
+
+        </StatusBar>
+    </Grid>
+</ribbon:RibbonWindow>
