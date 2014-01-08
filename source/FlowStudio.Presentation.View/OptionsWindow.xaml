@@ -1,9 +1,10 @@
-﻿<Window x:Class="FlowStudio.Presentation.View.OptionsWindow"
+﻿<common:MessengerAwareWindow x:Class="FlowStudio.Presentation.View.OptionsWindow"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:common="clr-namespace:FlowStudio.Presentation.Common;assembly=FlowStudio.Presentation.Common"
         Title="Options" 
         WindowStyle="ToolWindow" 
         WindowStartupLocation="CenterOwner" 
@@ -102,4 +103,4 @@
             <command:EventToCommand Command="{Binding CloseOptionsCommmand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-</Window>
+</common:MessengerAwareWindow>

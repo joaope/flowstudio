@@ -178,6 +178,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FlowStudio.Common\FlowStudio.Common.csproj">
+      <Project>{bd73bb1e-9665-42ae-b946-b9fbdce336cf}</Project>
+      <Name>FlowStudio.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FlowStudio.Presentation.Common\FlowStudio.Presentation.Common.csproj">
       <Project>{29B3D727-396A-4C1C-8F62-C4F4D22044F5}</Project>
       <Name>FlowStudio.Presentation.Common</Name>

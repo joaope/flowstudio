@@ -1,5 +1,6 @@
 ﻿namespace FlowStudio.Presentation.View
 {
+    using FlowStudio.Common;
     using GalaSoft.MvvmLight.Messaging;
     using System.ComponentModel;
     using System.Text;
@@ -13,25 +14,21 @@
     using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
     using TextBox = System.Windows.Controls.TextBox;
 
-
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow
+    public partial class MainWindow : IMessengerAware
     {
         public MainWindow()
         {
             InitializeComponent();
 
-            Messenger.Default.Register<SaveBeforeCloseMessage>(this, OnSaveBeforeCloseMessage);
-            Messenger.Default.Register<PerformCloseProgramMessage>(this, OnPerformCloseProgramMessage);
-            Messenger.Default.Register<SaveFileMessage>(this, OnSaveFileMessage);
-            Messenger.Default.Register<OpenFileMessage>(this, OnOpenFileMessage);
-            Messenger.Default.Register<OpenOptionsMessage>(this, OnOpenOptionsMessage);
-            Messenger.Default.Register<OpenDirectoryMessage>(this, OnOpenDirectoryMessage);
-            Messenger.Default.Register<SelectActivitiesTypesMessage>(this, OnSelectActivitiesTypesMessage);
-            Messenger.Default.Register<ClosingWhenExecutingMessage>(this, OnClosingWhenExecutingMessage);
-            Messenger.Default.Register<OpenAboutDialogMessage>(this, OnOpenAboutDialogMessage);
+            Messenger.Register<SaveBeforeCloseMessage>(this, OnSaveBeforeCloseMessage);
+            Messenger.Register<PerformCloseProgramMessage>(this, OnPerformCloseProgramMessage);
+            Messenger.Register<SaveFileMessage>(this, OnSaveFileMessage);
+            Messenger.Register<OpenFileMessage>(this, OnOpenFileMessage);
+            Messenger.Register<OpenOptionsMessage>(this, OnOpenOptionsMessage);
+            Messenger.Register<OpenDirectoryMessage>(this, OnOpenDirectoryMessage);
+            Messenger.Register<SelectActivitiesTypesMessage>(this, OnSelectActivitiesTypesMessage);
+            Messenger.Register<ClosingWhenExecutingMessage>(this, OnClosingWhenExecutingMessage);
+            Messenger.Register<OpenAboutDialogMessage>(this, OnOpenAboutDialogMessage);
         }
 
         private void OnOpenAboutDialogMessage(OpenAboutDialogMessage openAboutDialogMessage)
@@ -183,7 +180,7 @@
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            Messenger.Default.Send(new RequestCloseProgramMessage(
+            Messenger.Send(new RequestCloseProgramMessage(
                 this,
                 null,
                 result =>
@@ -198,6 +195,11 @@
         private void CloseButton_OnClick(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        public IMessenger Messenger
+        {
+            get { return TypeLocator.GetInstance<IMessenger>(); }
         }
     }
 }
